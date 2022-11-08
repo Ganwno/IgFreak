@@ -1,2 +1,2 @@
-ControlPort 9051
-HTTPTunnelPort 9876
+ControlPort 9876
+HTTPTunnelPort 4949

@@ -57,9 +57,27 @@ class Instagram():
     """
     Instagram controller
     """
-    def __init__(self):
-        return requests.get("https://instagram.com/t_dynamos",headers=headers).text
+    def __init__(self,username,Tor : Tor):
+        self.username = username
+        self.session = requests.session()
+        line = self.session.get("https://instagram.com/"+username).text.split("\n")[13]
+        if self.username not in line:
+            self.userexists  = False
+            self.name = None
+        else:
+            self.userexists = True
+            self.name = line.split("(")[0].split(">")[-1][:-1]
+        self.tor = Tor
+        self.session.proxies = self.tor.proxy()
+
+    def ipaddr(self) -> str:
+        return self.session.get("https://httpbin.org/ip").json()["origin"]
+
     def login(self,username,password) -> bool:
         pass
 
-print(Instagram())
+tor = Tor(9876,4949)
+tor.start()
+ig = Instagram("tdynamos.linux",tor)
+print(ig.name)
+print(ig.ipaddr())
