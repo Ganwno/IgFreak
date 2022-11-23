@@ -57,7 +57,8 @@ class Instagram():
     """
     Instagram controller
     """
-    def __init__(self,username,Tor : Tor):
+    def __init__(self,username,use_tor=None):
+        self.use_tor = use_tor
         self.username = username
         self.session = requests.session()
         try:
@@ -68,8 +69,6 @@ class Instagram():
             else:
                 self.userexists = True
                 self.name = line.split("(")[0].split(">")[-1][:-1]
-            self.tor = Tor
-            #self.session.proxies = self.tor.proxy()
         except Exception as e:
             print(str(e))
 
@@ -84,6 +83,8 @@ class Instagram():
             return passwords
 
     def login(self,password) -> bool:
+        if self.use_tor is not None:
+            self.session.proxies = self.use_tor.proxy()
         url = "https://i.instagram.com/api/v1/web/accounts/login/ajax/"
         data = {
             'username': f'{self.username}',
@@ -110,13 +111,11 @@ class Instagram():
         self.session.cookies.clear()
 
         def get_cookies(*args):
-            self.session.post(url,data = data,headers=head_pre) # prerequest
+            self.session.post(url,data = data,headers=head_pre) 
             cookies = self.session.cookies.get_dict()
-            print(cookies.keys())
             if "csrftoken" in cookies.keys():
                 with open(".cookie","w") as file:
-                    print(cookies)
-                    file.write(str(cookies))
+                    file.write(str(cookies).replace("'",'"'))
                     file.close
                 return cookies
             else:
@@ -126,7 +125,6 @@ class Instagram():
                 return cookies
                 
         response_cookies = get_cookies()
-
         head_post = {
             "Host": "i.instagram.com",
             "User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
@@ -150,7 +148,7 @@ class Instagram():
         return False
 
 tor = Tor(9876,4949)
-#tor.start()
-ig = Instagram("t_dynamos",tor)
+tor.start()
+ig = Instagram("tdynamos.linux",use_tor=tor)
 print(ig.name)
 ig.login("ansh1234")
