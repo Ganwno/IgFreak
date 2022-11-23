@@ -5,6 +5,7 @@ from shutil import which
 from stem.control import Controller
 from stem import Signal
 import requests
+import json
 
 class Tor(): 
     """
@@ -107,9 +108,24 @@ class Instagram():
             "TE": "trailers"
         }
         self.session.cookies.clear()
-        self.session.post(url,data = data,headers=head_pre) # prerequest
-        response_cookies = self.session.cookies.get_dict()
-        print(response_cookies)# gets tokens
+
+        def get_cookies(*args):
+            self.session.post(url,data = data,headers=head_pre) # prerequest
+            cookies = self.session.cookies.get_dict()
+            print(cookies.keys())
+            if "csrftoken" in cookies.keys():
+                with open(".cookie","w") as file:
+                    print(cookies)
+                    file.write(str(cookies))
+                    file.close
+                return cookies
+            else:
+                with open(".cookie","r") as file:
+                    cookies = json.load(file)
+                    file.close()
+                return cookies
+                
+        response_cookies = get_cookies()
 
         head_post = {
             "Host": "i.instagram.com",
@@ -134,7 +150,7 @@ class Instagram():
         return False
 
 tor = Tor(9876,4949)
-tor.start()
+#tor.start()
 ig = Instagram("t_dynamos",tor)
-for i in range(35):
-    print(ig.login("ansh1234"+str(i)))
+print(ig.name)
+ig.login("ansh1234")
