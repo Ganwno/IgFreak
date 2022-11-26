@@ -62,6 +62,7 @@ class Instagram():
         self.use_tor = use_tor
         self.username = username
         self.session = requests.session()
+        self.session.max_redirects = 500
         self.head_pre = {
             "Host": "i.instagram.com",
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
