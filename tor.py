@@ -128,7 +128,9 @@ class Instagram():
         }
 
     def get_name(self,username):
-        return self.session.get(f"https://www.instagram.com/{username}",headers=self.get_uni_headers())
+        head = self.get_uni_headers()
+        print("Done")
+        return self.session.get(f"https://www.instagram.com/{username}",headers=head)
 
     def login(self,password) -> bool:
         if self.use_tor is not None:
