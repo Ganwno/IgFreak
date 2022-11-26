@@ -92,7 +92,7 @@ class Instagram():
             return passwords
 
     def get_cookies(self):
-        self.session.post("https://www.instagram.com/",headers=self.head_pre) 
+        self.session.post("https://i.instagram.com/api/v1/web/accounts/login/ajax/",headers=self.head_pre) 
         cookies = self.session.cookies.get_dict()
         if "csrftoken" in cookies.keys():
             with open(".cookie","w") as file:
