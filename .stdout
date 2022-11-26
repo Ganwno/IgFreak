@@ -21,3 +21,14 @@ Nov 23 20:06:30.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Nov 23 20:06:30.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Nov 23 20:06:30.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Nov 23 20:06:32.000 [notice] Bootstrapped 100% (done): Done
+Nov 23 20:28:35.000 [notice] Tor has not observed any network activity for the past 1107 seconds. Disabling circuit build timeout recording.
+Nov 23 20:29:02.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:29:02.000 [notice] Our circuit 0 (id: 95) died due to an invalid selected path, purpose General-purpose client. This may be a torrc configuration issue, or a bug.
+Nov 23 20:30:46.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:33:21.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:35:55.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:41:04.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:43:13.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:45:46.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:48:21.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.
+Nov 23 20:50:55.000 [notice] Failed to find node for hop #1 of our path. Discarding this circuit.

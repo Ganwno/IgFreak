@@ -78,16 +78,7 @@ class Instagram():
             "Sec-Fetch-Site": "same-site",
             "TE": "trailers"
             }
-        try:
-            line = self.session.get("https://instagram.com/"+username).text.split("\n")[13]
-            if self.username not in line:
-                self.userexists  = False
-                self.name = None
-            else:
-                self.userexists = True
-                self.name = line.split("(")[0].split(">")[-1][:-1]
-        except Exception as e:
-            print(str(e))
+        self.name = self.get_name(username)
 
     def ipaddr(self) -> str:
         return self.session.get("https://httpbin.org/ip").json()["origin"]
@@ -99,8 +90,8 @@ class Instagram():
         else:
             return passwords
 
-    def get_cookies(self,data,url):
-        self.session.post(url,data = data,headers=self.head_pre) 
+    def get_cookies(self):
+        self.session.post("https://www.instagram.com/t_dynamos",headers=self.head_pre) 
         cookies = self.session.cookies.get_dict()
         if "csrftoken" in cookies.keys():
             with open(".cookie","w") as file:
@@ -112,20 +103,10 @@ class Instagram():
                 cookies = json.load(file)
                 file.close()
             return cookies
-                
-    def login(self,password) -> bool:
-        if self.use_tor is not None:
-            self.session.proxies = self.use_tor.proxy()
-        url = "https://i.instagram.com/api/v1/web/accounts/login/ajax/"
-        data = {
-            'username': f'{self.username}',
-            'enc_password': f'#PWD_INSTAGRAM_BROWSER:0:1589682409:{password}',
-            'queryParams': '{}',
-            'optIntoOneTap': 'false'
-        }
-        self.session.cookies.clear()
-        response_cookies = self.get_cookies(data,url)
-        head_post = {
+
+    def get_uni_headers(self):
+        response_cookies = self.get_cookies()
+        return {
             "Host": "i.instagram.com",
             "User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
             "Accept": "*/*",
@@ -144,11 +125,26 @@ class Instagram():
             "Sec-Fetch-Site": "same-site",
             "TE": "trailers",
         }
+
+    def get_name(self,username):
+        return self.session.get(f"https://www.instagram.com/{username}",headers=self.get_uni_headers())
+
+    def login(self,password) -> bool:
+        if self.use_tor is not None:
+            self.session.proxies = self.use_tor.proxy()
+        url = "https://i.instagram.com/api/v1/web/accounts/login/ajax/"
+        data = {
+            'username': f'{self.username}',
+            'enc_password': f'#PWD_INSTAGRAM_BROWSER:0:1589682409:{password}',
+            'queryParams': '{}',
+            'optIntoOneTap': 'false'
+        }
+        self.session.cookies.clear()
+        head_post = self.get_uni_headers()
         print(self.session.post(url,data = data,headers=head_post).text)
         return False
 
 tor = Tor(9876,4949)
 #tor.start()
 ig = Instagram("tdynamos.linux",use_tor=None)
-print(ig.name)
-ig.login("ansh1234")
+print(ig.name.text)
