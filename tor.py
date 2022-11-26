@@ -144,7 +144,7 @@ class Instagram():
         print(self.session.post(url,data = data,headers=head_post).text)
         return False
 
-tor = Tor(9876,4949)
+#tor = Tor(9876,4949)
 #tor.start()
 ig = Instagram("tdynamos.linux",use_tor=None)
 print(ig.name.text)
